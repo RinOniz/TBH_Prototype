@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskBar Hero - Web Idle Game Prototype</title>
+  <meta name="description" content="Nguyên mẫu game idle TaskBarHero với 3 Class: Chiến Binh, Cung Thủ, Pháp Sư" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+
+<body>
+  <!-- Backdrop overlay when side panel is open on smaller screens -->
+  <div id="panel-backdrop" class="panel-backdrop hidden"></div>
+
+  <div id="app" class="app-layout">
+
+    <!-- ==================== CỘT TRÁI: STATUS NHÂN VẬT (3 CLASS SEPARATE STATS) ==================== -->
+    <aside id="sidebar-status" class="side-panel sidebar-status">
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <span class="panel-icon">📊</span>
+          <div>
+            <h2 class="panel-title">STATUS NHÂN VẬT</h2>
+            <span id="status-role-subtitle" class="panel-subtitle">Chi tiết chỉ số theo Class</span>
+          </div>
+        </div>
+        <button id="btn-close-status" class="btn-panel-close" title="Đóng bảng Status [Esc hoặc S]">✕</button>
+      </div>
+
+      <!-- Class Selector Tabs in Status Panel -->
+      <div class="status-class-tabs">
+        <button id="status-tab-warrior" class="status-tab-btn active" data-char="warrior">🗡️ Chiến Binh</button>
+        <button id="status-tab-archer" class="status-tab-btn" data-char="archer">🏹 Cung Thủ</button>
+        <button id="status-tab-mage" class="status-tab-btn" data-char="mage">🔮 Pháp Sư</button>
+      </div>
+
+      <!-- Character Hero Profile Card -->
+      <div class="hero-profile-card">
+        <div id="status-avatar-box" class="hero-avatar-box">
+          <div id="status-hero-avatar" class="hero-avatar">🗡️</div>
+          <span id="status-level-badge" class="hero-lvl-badge">Lv.1</span>
+        </div>
+        <div class="hero-identity">
+          <div id="status-hero-name" class="hero-name">Chiến Binh</div>
+          <div id="status-hero-title" class="hero-title-tag">🌱 Chiến Binh Tập Sự</div>
+          <div id="status-hero-role" class="hero-role-desc">Cận chiến • Máu trâu • Bền bỉ</div>
+        </div>
+      </div>
+
+      <!-- Detailed Stats List -->
+      <div class="stats-group">
+        <div class="stats-group-title">⚔️ THUỘC TÍNH CHIẾN ĐẤU</div>
+
+        <!-- Damage -->
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">⚔️</span>
+            <span class="stat-label">Sát thương (ATK)</span>
+          </div>
+          <div class="stat-val-wrap">
+            <span id="stat-val-damage" class="stat-value text-red">12</span>
+            <span id="stat-detail-damage" class="stat-subdetail">Cơ bản 12</span>
+          </div>
+        </div>
+
+        <!-- Max HP -->
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">❤️</span>
+            <span class="stat-label">Máu tối đa (Max HP)</span>
+          </div>
+          <div class="stat-val-wrap">
+            <span id="stat-val-hp" class="stat-value text-green">100</span>
+          </div>
+        </div>
+
+        <!-- HP Regen -->
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">💖</span>
+            <span class="stat-label">Hồi máu mỗi giây</span>
+          </div>
+          <div class="stat-val-wrap">
+            <span id="stat-val-regen" class="stat-value text-emerald">+1 HP/s</span>
+          </div>
+        </div>
+
+        <!-- Attack Speed -->
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">⚡</span>
+            <span class="stat-label">Tốc độ đánh</span>
+          </div>
+          <div class="stat-val-wrap">
+            <span id="stat-val-attackspeed" class="stat-value text-yellow">1.0 đòn/s</span>
+            <span id="stat-buff-frenzy" class="buff-indicator hidden">🔥 Buff!</span>
+          </div>
+        </div>
+
+        <!-- Crit Chance -->
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">🎯</span>
+            <span class="stat-label">Tỉ lệ Bạo kích</span>
+          </div>
+          <div class="stat-val-wrap">
+            <span id="stat-val-critchance" class="stat-value text-amber">5.0%</span>
+          </div>
+        </div>
+
+        <!-- Crit DMG -->
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">💥</span>
+            <span class="stat-label">Sát thương Bạo kích</span>
+          </div>
+          <div class="stat-val-wrap">
+            <span id="stat-val-critmult" class="stat-value text-orange">200%</span>
+          </div>
+        </div>
+
+        <!-- Click Damage -->
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">👆</span>
+            <span class="stat-label">Sát thương Sét Click</span>
+          </div>
+          <div class="stat-val-wrap">
+            <span id="stat-val-clickdamage" class="stat-value text-cyan">9</span>
+          </div>
+        </div>
+
+        <!-- Gold Multiplier -->
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">💰</span>
+            <span class="stat-label">Bội số Vàng nhận</span>
+          </div>
+          <div class="stat-val-wrap">
+            <span id="stat-val-goldmult" class="stat-value text-gold">x1.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Battle Records Group -->
+      <div class="stats-group">
+        <div class="stats-group-title">🏆 KỶ LỤC CHIẾN TÍCH CHUNG</div>
+
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">☠️</span>
+            <span class="stat-label">Tổng quái đã diệt</span>
+          </div>
+          <span id="stat-record-kills" class="stat-value">0</span>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">👑</span>
+            <span class="stat-label">Trùm Boss đã hạ</span>
+          </div>
+          <span id="stat-record-bosses" class="stat-value text-orange">0</span>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-meta">
+            <span class="stat-icon">🚩</span>
+            <span class="stat-label">Ải cao nhất đã mở</span>
+          </div>
+          <span id="stat-record-maxstage" class="stat-value text-purple">Ải 1-1</span>
+        </div>
+      </div>
+
+    </aside>
+
+
+    <!-- ==================== CỘT GIỮA: MÀN HÌNH CHÍNH CỐ ĐỊNH ==================== -->
+    <main class="main-content">
+      
+      <!-- Top Header -->
+      <header class="game-header">
+        <div class="brand">
+          <span class="game-logo">⚔️</span>
+          <div class="brand-text">
+            <h1 class="game-title">TASKBAR HERO</h1>
+            <span class="game-subtitle">3 Classes Idle RPG</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button id="btn-toggle-mode" class="btn-action btn-mode" title="Phím tắt: T">
+            💻 Dạng Taskbar
+          </button>
+          <button id="btn-mute" class="btn-action">
+            🔊 Âm thanh
+          </button>
+          <button id="btn-reset" class="btn-action btn-danger" title="Chơi lại từ đầu">
+            🔄 Reset
+          </button>
+        </div>
+      </header>
+
+      <!-- Character Class Switcher Bar (3 Class Tab Control) -->
+      <section class="character-switcher-bar">
+        <button id="tab-char-warrior" class="btn-char-tab active" data-char="warrior" title="Chiến Binh: Cận chiến, Máu trâu [Phím Z]">
+          <span class="char-tab-avatar">🗡️</span>
+          <div class="char-tab-info">
+            <div class="char-tab-top">
+              <span class="char-tab-name">Chiến Binh</span>
+              <span class="char-tab-key">[Z]</span>
+            </div>
+            <span id="tab-lvl-warrior" class="char-tab-lvl">Lv.1</span>
+          </div>
+        </button>
+
+        <button id="tab-char-archer" class="btn-char-tab" data-char="archer" title="Cung Thủ: Tầm xa, Bắn nhanh, Crit cao [Phím X]">
+          <span class="char-tab-avatar">🏹</span>
+          <div class="char-tab-info">
+            <div class="char-tab-top">
+              <span class="char-tab-name">Cung Thủ</span>
+              <span class="char-tab-key">[X]</span>
+            </div>
+            <span id="tab-lvl-archer" class="char-tab-lvl">Lv.1</span>
+          </div>
+        </button>
+
+        <button id="tab-char-mage" class="btn-char-tab" data-char="mage" title="Pháp Sư: Cầu ma pháp, Sát thương bùng nổ [Phím C]">
+          <span class="char-tab-avatar">🔮</span>
+          <div class="char-tab-info">
+            <div class="char-tab-top">
+              <span class="char-tab-name">Pháp Sư</span>
+              <span class="char-tab-key">[C]</span>
+            </div>
+            <span id="tab-lvl-mage" class="char-tab-lvl">Lv.1</span>
+          </div>
+        </button>
+      </section>
+
+      <!-- HUD Bar: Gold, Level, Stage, HP -->
+      <section class="hud-bar">
+        <!-- Gold -->
+        <div class="hud-chip gold-chip">
+          <span class="chip-icon">💰</span>
+          <div class="chip-content">
+            <span class="chip-label">Kho Vàng</span>
+            <span id="hud-gold" class="chip-value gold-text">0</span>
+          </div>
+        </div>
+
+        <!-- Level & EXP of Active Character -->
+        <div class="hud-chip exp-chip">
+          <span id="hud-char-icon" class="chip-icon">🗡️</span>
+          <div class="chip-content">
+            <div class="chip-row">
+              <span id="hud-level" class="chip-label font-bold">Lv.1</span>
+              <span id="hud-exp-text" class="chip-sub">0/25 EXP</span>
+            </div>
+            <div class="bar-container exp-bar">
+              <div id="hud-exp-fill" class="bar-fill exp-fill" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stage Tracker -->
+        <div class="hud-chip stage-chip">
+          <span class="chip-icon">🗺️</span>
+          <div class="chip-content">
+            <span class="chip-label">Ải Hiện Tại</span>
+            <div class="chip-row">
+              <span id="hud-stage" class="chip-value">Ải 1-1</span>
+              <span id="hud-stage-badge" class="stage-badge">🌿 Wave 1/10</span>
+              <span id="hud-mode-badge" class="stage-mode-badge">⏩ Tiến ải</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Hero HP -->
+        <div class="hud-chip hp-chip">
+          <span class="chip-icon">❤️</span>
+          <div class="chip-content">
+            <div class="chip-row">
+              <span id="hud-hp-label" class="chip-label">Máu Chiến Binh</span>
+              <span id="hud-hp-text" class="chip-sub">100 / 100 HP</span>
+            </div>
+            <div class="bar-container hp-bar">
+              <div id="hud-hp-fill" class="bar-fill hp-fill" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Viewport: Canvas & Active Skills Overlay -->
+      <section class="viewport-wrapper">
+        <div id="game-container" class="game-canvas-container"></div>
+
+        <!-- Tap Assistance Hint -->
+        <div class="viewport-hint">
+          <span>⚡ Nhấp chuột vào màn hình để giáng sét hỗ trợ!</span>
+        </div>
+
+        <!-- Dynamic Skills Overlay Dock (Updated based on active class) -->
+        <div id="skills-dock" class="skills-dock">
+          <!-- Skill 1 -->
+          <button id="skill-btn-1" class="skill-btn" data-skill="skill1" title="Kỹ năng 1 [Phím 1 hoặc Q]">
+            <span id="skill-icon-1" class="skill-icon">🔥</span>
+            <span id="skill-name-1" class="skill-name">Cuồng Nộ</span>
+            <span class="skill-key">1</span>
+            <div class="skill-cd-fill"></div>
+          </button>
+
+          <!-- Skill 2 -->
+          <button id="skill-btn-2" class="skill-btn" data-skill="skill2" title="Kỹ năng 2 [Phím 2 hoặc W]">
+            <span id="skill-icon-2" class="skill-icon">⚡</span>
+            <span id="skill-name-2" class="skill-name">Thiên Lôi</span>
+            <span class="skill-key">2</span>
+            <div class="skill-cd-fill"></div>
+          </button>
+
+          <!-- Skill 3 -->
+          <button id="skill-btn-3" class="skill-btn" data-skill="skill3" title="Kỹ năng 3 [Phím 3 hoặc E]">
+            <span id="skill-icon-3" class="skill-icon">🧪</span>
+            <span id="skill-name-3" class="skill-name">Hồi Máu</span>
+            <span class="skill-key">3</span>
+            <div class="skill-cd-fill"></div>
+          </button>
+        </div>
+      </section>
+
+      <!-- ==================== HERO & INVENTORY CONSOLE (TaskBarHero Layout) ==================== -->
+      <section class="hero-inventory-section">
+        <!-- Top Hero Gothic Header Frame -->
+        <div class="hero-frame-header">
+          <div class="header-decor-left">
+            <span class="decor-rivet">❖</span>
+            <span class="decor-line"></span>
+          </div>
+          <div class="hero-header-center">
+            <span class="gothic-skull">💀</span>
+            <h2 class="hero-title-text">HERO</h2>
+            <span class="gothic-skull">💀</span>
+          </div>
+          <div class="header-decor-right">
+            <span class="decor-line"></span>
+            <button id="btn-open-upgrades" class="btn-hero-action btn-upgrade-hero" title="Mở bảng Nâng cấp chỉ số">
+              🛠️ Nâng Cấp
+            </button>
+            <button id="btn-auto-equip" class="btn-hero-action btn-auto-equip" title="Tự động trang bị đồ mạnh nhất">
+              ⚡ Tự Mặc
+            </button>
+          </div>
+        </div>
+
+        <!-- Hero Equipment Stage (Weathered Dark Stone Backing) -->
+        <div class="hero-stage-container">
+          <!-- Left 6 Gear Slots (2 cols x 3 rows) -->
+          <div class="equip-column equip-column-left">
+            <div class="equip-slot-item" data-slot="main_weapon" title="Vũ Khí Chính">
+              <span class="slot-placeholder">⚔️</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">V.Khí</span>
+            </div>
+            <div class="equip-slot-item" data-slot="sub_weapon" title="Vũ Khí Phụ">
+              <span class="slot-placeholder">🛡️</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">V.Phụ</span>
+            </div>
+            <div class="equip-slot-item" data-slot="helmet" title="Mũ Giáp">
+              <span class="slot-placeholder">🪖</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">Mũ</span>
+            </div>
+            <div class="equip-slot-item" data-slot="armor" title="Áo Giáp">
+              <span class="slot-placeholder">🥋</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">Áo</span>
+            </div>
+            <div class="equip-slot-item" data-slot="pants" title="Quần Giáp">
+              <span class="slot-placeholder">👖</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">Quần</span>
+            </div>
+            <div class="equip-slot-item" data-slot="boots" title="Giày">
+              <span class="slot-placeholder">👢</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">Giày</span>
+            </div>
+          </div>
+
+          <!-- Center Hero Portrait Display -->
+          <div class="hero-center-box">
+            <div class="hero-class-selector">
+              <button id="btn-prev-hero-class" class="btn-class-nav" title="Class trước">◀</button>
+              <span id="hero-display-class-name" class="hero-class-badge">Sorcerer (Pháp Sư)</span>
+              <button id="btn-next-hero-class" class="btn-class-nav" title="Class tiếp">▶</button>
+            </div>
+
+            <!-- Pixel Art Portrait Box -->
+            <div class="hero-portrait-frame">
+              <div id="hero-portrait-canvas" class="hero-portrait-canvas">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- Level & EXP Under Portrait -->
+            <div class="hero-level-exp-box">
+              <span id="hero-display-level" class="hero-level-text">Lv.101</span>
+              <div class="hero-exp-bar-wrap">
+                <div id="hero-display-exp-fill" class="hero-exp-fill" style="width: 65%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 6 Accessory Slots (2 cols x 3 rows) -->
+          <div class="equip-column equip-column-right">
+            <div class="equip-slot-item" data-slot="necklace" title="Dây Chuyền">
+              <span class="slot-placeholder">📿</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">Cổ</span>
+            </div>
+            <div class="equip-slot-item" data-slot="earring" title="Khuyên Tai">
+              <span class="slot-placeholder">💎</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">Tai</span>
+            </div>
+            <div class="equip-slot-item" data-slot="ring1" title="Nhẫn 1">
+              <span class="slot-placeholder">💍</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">Nhẫn 1</span>
+            </div>
+            <div class="equip-slot-item" data-slot="ring2" title="Nhẫn 2">
+              <span class="slot-placeholder">💍</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">Nhẫn 2</span>
+            </div>
+            <div class="equip-slot-item" data-slot="bracelet1" title="Vòng Tay 1">
+              <span class="slot-placeholder">🧿</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">Tay 1</span>
+            </div>
+            <div class="equip-slot-item" data-slot="bracelet2" title="Vòng Tay 2">
+              <span class="slot-placeholder">🧿</span>
+              <div class="slot-content"></div>
+              <span class="slot-tag">Tay 2</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Class Cards & 2 Skill Slots Row (Exactly as in TaskBarHero screenshot) -->
+        <div class="class-and-skills-row">
+          <!-- 3 Class Cards -->
+          <div class="hero-class-cards-strip">
+            <button class="hero-class-card-item" data-char="warrior" title="Chuyển sang Chiến Binh [Z]">
+              <div class="class-card-avatar-box">🗡️</div>
+              <span class="class-card-title">Chiến Binh</span>
+              <span id="card-hero-lvl-warrior" class="class-card-lvl">Lv.15</span>
+            </button>
+            <button class="hero-class-card-item" data-char="archer" title="Chuyển sang Cung Thủ [X]">
+              <div class="class-card-avatar-box">🏹</div>
+              <span class="class-card-title">Cung Thủ</span>
+              <span id="card-hero-lvl-archer" class="class-card-lvl">Lv.15</span>
+            </button>
+            <button class="hero-class-card-item active" data-char="mage" title="Chuyển sang Pháp Sư [C]">
+              <div class="class-card-avatar-box">🔮</div>
+              <span class="class-card-title">Pháp Sư</span>
+              <span id="card-hero-lvl-mage" class="class-card-lvl">Lv.101</span>
+            </button>
+          </div>
+
+          <!-- 2 Skill Slots (Hexagonal / Faceted Slots) -->
+          <div class="hero-equipped-skills">
+            <button id="hero-slot-skill-1" class="hero-hex-skill-slot" data-skill="skill1" title="Kỹ năng 1 [Phím 1 hoặc Q]">
+              <span id="hero-hex-icon-1" class="hex-skill-icon">✨</span>
+              <span class="hex-skill-key">1</span>
+              <div id="hero-hex-cd-1" class="hex-skill-cd"></div>
+            </button>
+            <button id="hero-slot-skill-2" class="hero-hex-skill-slot" data-skill="skill2" title="Kỹ năng 2 [Phím 2 hoặc W]">
+              <span id="hero-hex-icon-2" class="hex-skill-icon">☄️</span>
+              <span class="hex-skill-key">2</span>
+              <div id="hero-hex-cd-2" class="hex-skill-cd"></div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Inventory Container -->
+        <div class="inventory-section-box">
+          <div class="inventory-bar-header">
+            <div class="inv-header-left">
+              <span class="inv-tab-icon">🎒</span>
+              <span class="inv-tab-title">INVENTORY</span>
+              <span id="inv-capacity-counter" class="inv-capacity-tag">14 / 28</span>
+            </div>
+            <div class="inv-header-filters">
+              <button class="inv-filter-tab active" data-filter="all">Tất Cả</button>
+              <button class="inv-filter-tab" data-filter="gear">Trang Bị</button>
+              <button class="inv-filter-tab" data-filter="accessory">Phụ Kiện</button>
+              <button id="btn-quick-sell" class="inv-filter-tab btn-trash" title="Bán tất cả đồ Thường/Tốt">
+                💰 Bán Rác
+              </button>
+            </div>
+          </div>
+
+          <!-- 28 Inventory Grid Slots (7 cols x 4 rows) -->
+          <div id="inventory-grid" class="inventory-grid-table">
+            <!-- Dynamic 28 slots rendered by UIManager -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Bottom Navigation Controls: 2 Buttons to Toggle Panels -->
+      <div class="bottom-nav-controls">
+        <button id="btn-toggle-status" class="btn-nav-panel" title="Bật/Tắt khung Status bên trái (Phím tắt: S)">
+          <span class="nav-btn-icon">📊</span>
+          <span class="nav-btn-text">Status Nhân Vật</span>
+          <span class="nav-btn-hotkey">[S]</span>
+        </button>
+
+        <button id="btn-toggle-map" class="btn-nav-panel" title="Bật/Tắt khung Bản đồ bên phải (Phím tắt: M)">
+          <span class="nav-btn-icon">🗺️</span>
+          <span class="nav-btn-text">Bản Đồ Màn Chơi</span>
+          <span class="nav-btn-hotkey">[M]</span>
+        </button>
+      </div>
+
+    </main>
+
+
+    <!-- ==================== CỘT PHẢI: BẢN ĐỒ TIẾN TRÌNH (MAP DRAWER) ==================== -->
+    <aside id="sidebar-map" class="side-panel sidebar-map">
+      <div class="panel-header">
+        <div class="panel-title-wrap">
+          <span class="panel-icon">🗺️</span>
+          <div class="map-header-content">
+            <h2 class="panel-title">BẢN ĐỒ TIẾN TRÌNH</h2>
+            <div class="world-navigator">
+              <button id="btn-prev-world" class="btn-world-nav" title="Xem thế giới trước">◀</button>
+              <span id="map-world-title" class="world-name-badge">Thế Giới 1: Rừng Xanh</span>
+              <button id="btn-next-world" class="btn-world-nav" title="Xem thế giới sau">▶</button>
+            </div>
+          </div>
+        </div>
+        <button id="btn-close-map" class="btn-panel-close" title="Đóng bảng Bản Đồ [Esc hoặc M]">✕</button>
+      </div>
+
+      <button id="btn-return-current-stage" class="btn-return-current hidden" title="Quay về ải đang chiến đấu">
+        📍 Quay về Ải Đang Đánh
+      </button>
+
+      <!-- Boss Defeat Alert / Callout -->
+      <div id="boss-alert-box" class="boss-callout hidden">
+        <div class="callout-header">
+          <span class="callout-icon">⚠️</span>
+          <div>
+            <div class="callout-title">THẤT BẠI TRƯỚC BOSS!</div>
+            <div class="callout-desc">Đang lùi về ải trước để treo máy farm vàng & exp.</div>
+          </div>
+        </div>
+        <button id="btn-challenge-boss" class="btn-challenge-boss">
+          ⚔️ KHIÊU CHIẾN LẠI BOSS (Ải 10)
+        </button>
+        <label class="auto-challenge-toggle">
+          <input type="checkbox" id="chk-auto-boss" />
+          <span>Tự động khiêu chiến lại Boss</span>
+        </label>
+      </div>
+
+      <!-- Stage Progression Mode Toggle (Auto-Advance vs Repeat / Farm) -->
+      <div class="map-mode-control">
+        <button id="btn-toggle-autoadvance" class="btn-toggle-autoadvance active" title="Bật/Tắt tự động qua ải">
+          <span class="auto-mode-icon">⏩</span>
+          <span class="auto-mode-text">Chế độ: Tự Động Qua Ải (BẬT)</span>
+        </button>
+      </div>
+
+      <!-- Stage Selector Tabs / List (1-1 to 1-10) -->
+      <div class="map-list-wrapper">
+        <div class="map-list-header">
+          <span id="map-stages-title">DANH SÁCH ẢI (1-1 ➔ 1-10)</span>
+          <span id="map-progress-count" class="map-progress-count">1/10</span>
+        </div>
+        <div id="map-stages-list" class="map-stages-list">
+          <!-- Rendered dynamically by UIManager -->
+        </div>
+      </div>
+
+      <div class="map-footer-hint">
+        💡 Bạn có thể dùng ◀ ▶ để duyệt các Thế Giới và nhấp vào bất kỳ ải nào đã vượt qua để quay lại farm!
+      </div>
+    </aside>
+
+  <!-- ==================== POPUP MODALS ==================== -->
+
+  <!-- 1. Modal Nâng Cấp Chỉ Số (Mở từ button "🛠️ Nâng Cấp") -->
+  <div id="modal-upgrades" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-icon">🛠️</span>
+          <div>
+            <h3 id="modal-upgrades-title" class="modal-title">NÂNG CẤP CHỈ SỐ: PHÁP SƯ</h3>
+            <span class="modal-subtitle">Gia tăng chỉ số vĩnh viễn bằng Vàng</span>
+          </div>
+        </div>
+        <button id="btn-close-upgrades" class="btn-modal-close" title="Đóng [Esc]">✕</button>
+      </div>
+      <div id="upgrades-container" class="upgrades-grid modal-upgrades-grid">
+        <!-- Dynamic cards rendered by UIManager -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Modal Chi Tiết Trang Bị (Item Inspection) -->
+  <div id="modal-item-detail" class="modal-overlay hidden">
+    <div class="item-detail-card">
+      <div class="item-detail-header">
+        <div id="item-detail-icon-wrap" class="item-detail-icon-box rarity-epic">
+          <span id="item-detail-icon">🪄</span>
+        </div>
+        <div class="item-detail-header-info">
+          <div id="item-detail-name" class="item-detail-name color-epic">Trượng Tinh Vân Cổ</div>
+          <div class="item-detail-meta-row">
+            <span id="item-detail-type" class="item-detail-badge">Vũ Khí Chính</span>
+            <span id="item-detail-rarity" class="item-detail-badge badge-rarity">Sử Thi</span>
+            <span id="item-detail-lvl" class="item-detail-badge badge-lvl">Lv. 90</span>
+          </div>
+        </div>
+        <button id="btn-close-item-detail" class="btn-modal-close" title="Đóng">✕</button>
+      </div>
+
+      <div id="item-detail-stats" class="item-detail-stats-list">
+        <!-- Dynamic stats list -->
+      </div>
+
+      <div id="item-detail-desc" class="item-detail-desc-text">
+        Mô tả trang bị...
+      </div>
+
+      <div class="item-detail-actions">
+        <button id="btn-item-action-equip" class="btn-item-action btn-equip">🗡️ Mặc Vào</button>
+        <button id="btn-item-action-enhance" class="btn-item-action btn-enhance">⚡ Cường Hoá</button>
+        <button id="btn-item-action-sell" class="btn-item-action btn-sell">💰 Bán Đồ</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>
